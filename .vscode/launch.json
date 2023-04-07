@@ -1,0 +1,43 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Backend: Launch Program",
+        "program": "${workspaceFolder}/backend/app.js",
+        "env": {
+          "NODE_ENV": "development"
+        },
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "runtimeExecutable": "nodemon",
+        "restart": true,
+        "skipFiles": [
+          "<node_internals>/**"
+        ]
+      },
+      {
+        "type": "chrome",
+        "request": "launch",
+        "name": "Frontend: Vue.js application",
+        "url": "http://localhost:8080",
+        "webRoot": "${workspaceFolder}/frontend",
+        "breakOnLoad": true,
+        "sourceMapPathOverrides": {
+          "webpack:///src/*": "${webRoot}/src/*"
+        },
+        "preLaunchTask": "npm: frontend-serve"
+      }
+    ],
+    "compounds": [
+      {
+        "name": "Full-stack: Launch Frontend & Backend",
+        "configurations": [
+          "Backend: Launch Program",
+          "Frontend: Vue.js application"
+        ]
+      }
+    ]
+  }
+  
