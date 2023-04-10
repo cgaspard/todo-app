@@ -35,7 +35,7 @@ router.post("/", async (req, res) => {
       title: req.body.title,
       description: req.body.description,
       completed: false,
-      user: req.user._id,
+      user: req.user == null ? 0 : req.user.id,
     });
     const newTodo = await todo.save();
     res.status(201).json(newTodo);
