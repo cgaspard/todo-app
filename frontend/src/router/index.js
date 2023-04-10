@@ -2,9 +2,9 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import store from "@/store";
 
-import Splash from "@/views/Splash.vue";
-import Login from "@/views/Login.vue";
-import Logout from "@/views/Logout.vue";
+import Splash from "@/components/Splash.vue";
+import Login from "@/components/Login.vue";
+import Logout from "@/components/Logout.vue";
 import TodoList from "@/components/TodoList.vue";
 
 Vue.use(VueRouter);
