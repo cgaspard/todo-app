@@ -11,7 +11,7 @@
         },
         "console": "integratedTerminal",
         "internalConsoleOptions": "neverOpen",
-        "runtimeExecutable": "nodemon",
+        "runtimeExecutable": "node",
         "restart": true,
         "skipFiles": [
           "<node_internals>/**"

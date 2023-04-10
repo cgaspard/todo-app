@@ -1,75 +1,44 @@
-const sqlite3 = require("sqlite3").verbose();
-const db = new sqlite3.Database(":memory:");
-
-db.serialize(() => {
-  db.run(`
-    CREATE TABLE users (
-      id INTEGER PRIMARY KEY,
-      google_id TEXT UNIQUE,
-      facebook_id TEXT UNIQUE,
-      display_name TEXT
-    )
-  `);
-
-  db.run(`
-    CREATE TABLE todos (
-      id INTEGER PRIMARY KEY,
-      user_id INTEGER,
-      title TEXT,
-      description TEXT,
-      completed BOOLEAN,
-      FOREIGN KEY(user_id) REFERENCES users(id)
-    )
-  `);
+const { Sequelize } = require("sequelize");
+// Initialize Sequelize instance
+const TodoModel = require("./models/todo");
+const UserModel = require("./models/user");
+const sequelize = new Sequelize({
+  dialect: "sqlite",
+  storage: "./database.sqlite",
 });
 
-const getUserById = (id) => {
-  return new Promise((resolve, reject) => {
-    db.get("SELECT * FROM users WHERE id = ?", [id], (err, row) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(row);
-    });
+// Define models
+const Todo = TodoModel(sequelize);
+const User = UserModel(sequelize);
+
+// Define user model functions
+async function getUserById(id) {
+  const user = await User.findByPk(id);
+  return user;
+}
+
+async function findOrCreateUser(profile) {
+  const [user, created] = await User.findOrCreate({
+    where: { googleId: profile.id },
+    defaults: { email: profile.emails[0].value, name: profile.displayName },
   });
-};
+  return user;
+}
 
-const findOrCreateUser = (profile) => {
-  return new Promise((resolve, reject) => {
-    const googleId = profile.provider === "google" ? profile.id : null;
-    const facebookId = profile.provider === "facebook" ? profile.id : null;
+// Sync models with the database
+sequelize.sync().then(() => {
+  console.log("Tables synced successfully.");
+});
 
-    db.get(
-      "SELECT * FROM users WHERE google_id = ? OR facebook_id = ?",
-      [googleId, facebookId],
-      (err, row) => {
-        if (err) {
-          return reject(err);
-        }
-
-        if (row) {
-          resolve(row);
-        } else {
-          db.run(
-            "INSERT INTO users (google_id, facebook_id, display_name) VALUES (?, ?, ?)",
-            [googleId, facebookId, profile.displayName],
-            function (err) {
-              if (err) {
-                return reject(err);
-              }
-              resolve(getUserById(this.lastID));
-            }
-          );
-        }
-      }
-    );
-  });
-};
-
-// Add your other database functions for todos below
+function initialize() {
+  return Promise.resolve();
+}
 
 module.exports = {
+  sequelize,
+  User,
+  Todo,
   getUserById,
   findOrCreateUser,
-  // Export other database functions
+  initialize,
 };
